@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/opcion_perfil_trabajador"
+        android:title="Perfil" />
+    <item
+        android:id="@+id/opcion_MisAsistencias"
+        android:title="Mis Asistencias" />
+    <item
+        android:id="@+id/opcion_MisIncidencias"
+        android:title="Mis Incidencias" />
+    <item
+        android:id="@+id/opcion_MiHorario"
+        android:title="Mi Horario" />
+    <item
+        android:id="@+id/opcion_cerrar_sesion"
+        android:title="Cerrar Sesion" />
+</menu>
