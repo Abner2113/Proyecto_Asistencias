@@ -23,8 +23,36 @@ data class Usuario(
     val periodo: String,
 
     @SerializedName("nombreCompleto")
-    val nombreCompletoServidor: String? = null
+    val nombreCompletoServidor: String? = null,
+
+    @SerializedName("Telefono")
+    val telefono: String,
+
+    @SerializedName("Email")
+    val email: String,
+
+    @SerializedName("Estado")
+    val estado: String,
+
+    @SerializedName("Municipio")
+    val municipio: String,
+
+    @SerializedName("CodigoPostal")
+    val codigoPostal: String,
+
+    @SerializedName("Colonia")
+    val colonia: String,
+
+    @SerializedName("Calle")
+    val calle: String,
+
+    @SerializedName("NumExterior")
+    val numExterior: String,
+
+    @SerializedName("NumInterior")
+    val numInterior: String?
 ) {
+    // Este lo sigues usando en MainActivity
     val nombreCompleto: String
         get() = "$nombre $apellidoPaterno $apellidoMaterno"
 }

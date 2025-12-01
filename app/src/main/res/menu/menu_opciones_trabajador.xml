@@ -13,6 +13,9 @@
         android:id="@+id/opcion_MiHorario"
         android:title="Mi Horario" />
     <item
+        android:id="@+id/menuMapaNavegacion"
+        android:title="Mapa de navegación"/>
+    <item
         android:id="@+id/opcion_cerrar_sesion"
         android:title="Cerrar Sesion" />
 </menu>

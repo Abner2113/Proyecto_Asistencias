@@ -130,15 +130,42 @@ class MainActivity : AppCompatActivity() {
                         intent.putExtra("nombreCompleto", usuario.nombreCompleto)
                         intent.putExtra("periodo", usuario.periodo)
                         intent.putExtra("rol", usuario.rol)
+
+                        // NUEVOS EXTRAS
+                        intent.putExtra("telefono", usuario.telefono)
+                        intent.putExtra("email", usuario.email)
+                        intent.putExtra("estado", usuario.estado)
+                        intent.putExtra("municipio", usuario.municipio)
+                        intent.putExtra("codigoPostal", usuario.codigoPostal)
+                        intent.putExtra("colonia", usuario.colonia)
+                        intent.putExtra("calle", usuario.calle)
+                        intent.putExtra("numExterior", usuario.numExterior)
+                        intent.putExtra("numInterior", usuario.numInterior)
+
                         startActivity(intent)
                     }
+
                     "Administrador" -> {
                         val intent = Intent(this@MainActivity, usuario_administrador::class.java)
                         intent.putExtra("idTrabajador", usuario.idTrabajador)
                         intent.putExtra("nombreCompleto", usuario.nombreCompleto)
                         intent.putExtra("periodo", usuario.periodo)
+                        intent.putExtra("rol", usuario.rol)
+
+                        // NUEVOS EXTRAS
+                        intent.putExtra("telefono", usuario.telefono)
+                        intent.putExtra("email", usuario.email)
+                        intent.putExtra("estado", usuario.estado)
+                        intent.putExtra("municipio", usuario.municipio)
+                        intent.putExtra("codigoPostal", usuario.codigoPostal)
+                        intent.putExtra("colonia", usuario.colonia)
+                        intent.putExtra("calle", usuario.calle)
+                        intent.putExtra("numExterior", usuario.numExterior)
+                        intent.putExtra("numInterior", usuario.numInterior)
+
                         startActivity(intent)
                     }
+
                     else -> {
                         Toast.makeText(
                             this@MainActivity,
@@ -147,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                         ).show()
                     }
                 }
+
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Usuario>>>, t: Throwable) {

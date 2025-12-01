@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,10 +16,22 @@ import com.google.android.material.appbar.MaterialToolbar
 
 class usuario_trabajador : AppCompatActivity() {
 
+
     private var idTrabajador: Int = 0
     private var nombreCompleto: String = ""
     private var periodo: String = "20253"
     private var rol: String = ""
+
+    // NUEVOS CAMPOS
+    private var telefono: String = ""
+    private var email: String = ""
+    private var estado: String = ""
+    private var municipio: String = ""
+    private var codigoPostal: String = ""
+    private var colonia: String = ""
+    private var calle: String = ""
+    private var numExterior: String = ""
+    private var numInterior: String? = null
 
     private lateinit var txtBienvenida: TextView
     private lateinit var txtIdTrabajador: TextView
@@ -27,7 +40,6 @@ class usuario_trabajador : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_usuario_trabajador)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
@@ -49,10 +61,37 @@ class usuario_trabajador : AppCompatActivity() {
         periodo = intent.getStringExtra("periodo") ?: "20253"
         rol = intent.getStringExtra("rol") ?: "Empleado"
 
-        txtBienvenida.text = "¡Bienvenido, $nombreCompleto!"
-        txtIdTrabajador.text = "ID trabajador: $idTrabajador"
-        txtRolTrabajador.text = "Rol: $rol"
-        txtPeriodo.text = "Periodo actual: $periodo"
+        telefono = intent.getStringExtra("telefono") ?: ""
+        email = intent.getStringExtra("email") ?: ""
+        estado = intent.getStringExtra("estado") ?: ""
+        municipio = intent.getStringExtra("municipio") ?: ""
+        codigoPostal = intent.getStringExtra("codigoPostal") ?: ""
+        colonia = intent.getStringExtra("colonia") ?: ""
+        calle = intent.getStringExtra("calle") ?: ""
+        numExterior = intent.getStringExtra("numExterior") ?: ""
+        numInterior = intent.getStringExtra("numInterior")
+
+        txtBienvenida.text = nombreCompleto
+
+        val info = buildString {
+            appendLine("ID trabajador: $idTrabajador")
+            appendLine("Rol: $rol")
+            appendLine("Periodo actual: $periodo")
+            appendLine()
+            appendLine("Teléfono: $telefono")
+            appendLine("Email: $email")
+            appendLine()
+            appendLine("Dirección:")
+            appendLine("${calle} #$numExterior")
+            appendLine("Col. $colonia, C.P. $codigoPostal")
+            appendLine("$municipio, $estado")
+            appendLine("Num. interior: ${numInterior ?: "N/A"}")
+        }
+
+        txtIdTrabajador.text = info
+
+        txtRolTrabajador.visibility = View.GONE
+        txtPeriodo.visibility = View.GONE
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -85,6 +124,13 @@ class usuario_trabajador : AppCompatActivity() {
 
             R.id.opcion_MiHorario -> {
                 val intent = Intent(this, horario_trabajador::class.java)
+                intent.putExtra("idTrabajador", idTrabajador)
+                intent.putExtra("periodo", periodo)
+                startActivity(intent)
+                true
+            }
+            R.id.menuMapaNavegacion -> {
+                val intent = Intent(this, mapa_navegacion_trabajador::class.java)
                 intent.putExtra("idTrabajador", idTrabajador)
                 intent.putExtra("periodo", periodo)
                 startActivity(intent)

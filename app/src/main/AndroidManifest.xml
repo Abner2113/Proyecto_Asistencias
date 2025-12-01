@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoAsistencias">
         <activity
+            android:name=".Vistas.mapa_navegacion"
+            android:exported="false" />
+        <activity
+            android:name=".Vistas.mapa_navegacion_trabajador"
+            android:exported="false" />
+        <activity
             android:name=".Vistas.horario_trabajador"
             android:exported="false" />
         <activity
@@ -38,12 +44,6 @@
             android:exported="false" />
         <activity
             android:name=".Vistas.historial_asistencias_admin"
-            android:exported="false" />
-        <activity
-            android:name=".Vistas.actualizar_usuario_admin"
-            android:exported="false" />
-        <activity
-            android:name=".Vistas.registrar_usuario_admin"
             android:exported="false" />
         <activity
             android:name=".Vistas.historial_usuarios_admin"
