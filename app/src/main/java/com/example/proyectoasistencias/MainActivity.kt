@@ -11,16 +11,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.proyectoasistencias.Modelos.ApiResponse
+import com.example.proyectoasistencias.Contratos.LoginContract
 import com.example.proyectoasistencias.Modelos.RetrofitClient
 import com.example.proyectoasistencias.Modelos.Usuario
+import com.example.proyectoasistencias.Presentadores.LoginPresenter
 import com.example.proyectoasistencias.Vistas.usuario_administrador
 import com.example.proyectoasistencias.Vistas.usuario_trabajador
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LoginContract.View {
 
     private lateinit var spPeriodo: Spinner
     private lateinit var spPuesto: Spinner
@@ -28,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var edtIdTrabajador: EditText
     private lateinit var edtContrasena: EditText
     private lateinit var btnIniciarSesion: Button
+
+    private lateinit var presenter: LoginContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +40,14 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Vincular vistas
         spPeriodo = findViewById(R.id.spPeriodo)
         spPuesto = findViewById(R.id.spPuesto)
         edtIdTrabajador = findViewById(R.id.etIdTrabajador)
         edtContrasena = findViewById(R.id.etContrasena)
         btnIniciarSesion = findViewById(R.id.btnIniciarSesion)
 
+        // Llenar spinner de periodo
         val opcionesPeriodo = arrayOf("20253")
         val adaptador1 = ArrayAdapter(
             this,
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         )
         spPeriodo.adapter = adaptador1
 
+        // Llenar spinner de puesto
         val opcionesPuesto = arrayOf("Empleado", "Administrador")
         val adaptador2 = ArrayAdapter(
             this,
@@ -61,129 +64,80 @@ class MainActivity : AppCompatActivity() {
             opcionesPuesto
         )
         spPuesto.adapter = adaptador2
+
+        // Inicializar presenter (usa tu RetrofitClient.api existente)
+        presenter = LoginPresenter(this, RetrofitClient.api)
+
+        // Click del botón usando el presenter
         btnIniciarSesion.setOnClickListener {
-            hacerLogin()
+            presenter.onClickIniciarSesion()
         }
     }
 
-    private fun hacerLogin() {
-        val idTrabajador = edtIdTrabajador.text.toString().trim()
-        val contrasena = edtContrasena.text.toString().trim()
-        val periodo = spPeriodo.selectedItem.toString()
-        val puesto = spPuesto.selectedItem.toString()
+    // =======================
+    // Implementación de LoginContract.View
+    // =======================
 
-        if (idTrabajador.isEmpty() || contrasena.isEmpty()) {
-            Toast.makeText(this, "Ingresa ID y contraseña", Toast.LENGTH_SHORT).show()
-            return
-        }
+    override fun obtenerIdTrabajador(): String = edtIdTrabajador.text.toString()
 
-        val call = RetrofitClient.api.login(periodo, puesto, idTrabajador, contrasena)
+    override fun obtenerContrasena(): String = edtContrasena.text.toString()
 
-        call.enqueue(object : Callback<ApiResponse<List<Usuario>>> {
-            override fun onResponse(
-                call: Call<ApiResponse<List<Usuario>>>,
-                response: Response<ApiResponse<List<Usuario>>>
-            ) {
-                if (!response.isSuccessful) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Error de servidor: ${response.code()}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return
-                }
+    override fun obtenerPeriodo(): String = spPeriodo.selectedItem.toString()
 
-                val body = response.body()
-                if (body == null) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Respuesta vacía del servidor",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return
-                }
+    override fun obtenerPuesto(): String = spPuesto.selectedItem.toString()
 
-                if (!body.ok) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        body.mensaje,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return
-                }
+    override fun mostrarProgreso(mostrar: Boolean) {
+        btnIniciarSesion.isEnabled = !mostrar
+    }
 
-                val listaUsuarios = body.datos
-                if (listaUsuarios.isNullOrEmpty()) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "No se encontró el usuario",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return
-                }
+    override fun mostrarError(mensaje: String) {
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+    }
 
-                val usuario = listaUsuarios[0]
-                when (usuario.rol) {
-                    "Empleado" -> {
-                        val intent = Intent(this@MainActivity, usuario_trabajador::class.java)
-                        intent.putExtra("idTrabajador", usuario.idTrabajador)
-                        intent.putExtra("nombreCompleto", usuario.nombreCompleto)
-                        intent.putExtra("periodo", usuario.periodo)
-                        intent.putExtra("rol", usuario.rol)
+    override fun navegarAUsuarioTrabajador(usuario: Usuario) {
+        val intent = Intent(this, usuario_trabajador::class.java)
 
-                        // NUEVOS EXTRAS
-                        intent.putExtra("telefono", usuario.telefono)
-                        intent.putExtra("email", usuario.email)
-                        intent.putExtra("estado", usuario.estado)
-                        intent.putExtra("municipio", usuario.municipio)
-                        intent.putExtra("codigoPostal", usuario.codigoPostal)
-                        intent.putExtra("colonia", usuario.colonia)
-                        intent.putExtra("calle", usuario.calle)
-                        intent.putExtra("numExterior", usuario.numExterior)
-                        intent.putExtra("numInterior", usuario.numInterior)
+        intent.putExtra("idTrabajador", usuario.idTrabajador)
+        intent.putExtra("nombreCompleto", usuario.nombreCompleto)
+        intent.putExtra("periodo", usuario.periodo)
+        intent.putExtra("rol", usuario.rol)
 
-                        startActivity(intent)
-                    }
+        intent.putExtra("telefono", usuario.telefono)
+        intent.putExtra("email", usuario.email)
+        intent.putExtra("estado", usuario.estado)
+        intent.putExtra("municipio", usuario.municipio)
+        intent.putExtra("codigoPostal", usuario.codigoPostal)
+        intent.putExtra("colonia", usuario.colonia)
+        intent.putExtra("calle", usuario.calle)
+        intent.putExtra("numExterior", usuario.numExterior)
+        intent.putExtra("numInterior", usuario.numInterior)
 
-                    "Administrador" -> {
-                        val intent = Intent(this@MainActivity, usuario_administrador::class.java)
-                        intent.putExtra("idTrabajador", usuario.idTrabajador)
-                        intent.putExtra("nombreCompleto", usuario.nombreCompleto)
-                        intent.putExtra("periodo", usuario.periodo)
-                        intent.putExtra("rol", usuario.rol)
+        startActivity(intent)
+    }
 
-                        // NUEVOS EXTRAS
-                        intent.putExtra("telefono", usuario.telefono)
-                        intent.putExtra("email", usuario.email)
-                        intent.putExtra("estado", usuario.estado)
-                        intent.putExtra("municipio", usuario.municipio)
-                        intent.putExtra("codigoPostal", usuario.codigoPostal)
-                        intent.putExtra("colonia", usuario.colonia)
-                        intent.putExtra("calle", usuario.calle)
-                        intent.putExtra("numExterior", usuario.numExterior)
-                        intent.putExtra("numInterior", usuario.numInterior)
+    override fun navegarAUsuarioAdministrador(usuario: Usuario) {
+        val intent = Intent(this, usuario_administrador::class.java)
 
-                        startActivity(intent)
-                    }
+        intent.putExtra("idTrabajador", usuario.idTrabajador)
+        intent.putExtra("nombreCompleto", usuario.nombreCompleto)
+        intent.putExtra("periodo", usuario.periodo)
+        intent.putExtra("rol", usuario.rol)
 
-                    else -> {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Rol no reconocido: ${usuario.rol}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+        intent.putExtra("telefono", usuario.telefono)
+        intent.putExtra("email", usuario.email)
+        intent.putExtra("estado", usuario.estado)
+        intent.putExtra("municipio", usuario.municipio)
+        intent.putExtra("codigoPostal", usuario.codigoPostal)
+        intent.putExtra("colonia", usuario.colonia)
+        intent.putExtra("calle", usuario.calle)
+        intent.putExtra("numExterior", usuario.numExterior)
+        intent.putExtra("numInterior", usuario.numInterior)
 
-            }
+        startActivity(intent)
+    }
 
-            override fun onFailure(call: Call<ApiResponse<List<Usuario>>>, t: Throwable) {
-                Toast.makeText(
-                    this@MainActivity,
-                    "Error de conexión: ${t.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
+    override fun onDestroy() {
+        presenter.onDestroy()
+        super.onDestroy()
     }
 }
